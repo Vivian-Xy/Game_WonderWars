@@ -12,13 +12,10 @@ public class TriviaManager : MonoBehaviour
     public Button[] answerButtons;
     public TextMeshProUGUI feedbackText;    // Optional feedback
     public TextMeshProUGUI scoreText;
-
-    [Header("End-Of-Quiz UI")]
-    public GameObject endQuizPanel;        // drag EndQuizPanel here
-    public TextMeshProUGUI finalScoreText; // drag FinalScoreText here
+    public Animator feedbackAnimator; // <-- Add here, after other UI references
 
     [Header("Reward Settings")]
-    public GameObject rewardPrefab;
+    public List<GameObject> rewardPrefab;
     public Transform rewardSpawnPoint;
 
     [Header("Trivia Data")]
@@ -26,18 +23,24 @@ public class TriviaManager : MonoBehaviour
     public int currentQuestionIndex = 0;
     public int CurrentScore = 0;
 
+    // Add a private pool for shuffled questions
+    private List<TriviaQuestion> pool;
+
     [Header("Audio & Haptics")]
     public AudioClip correctClip;
     public AudioClip wrongClip;
     public AudioSource audioSource;
 
-    // Haptic amplitude and duration
+    [Header("Visual FX")]
+    public GameObject correctFXPrefab;
+    public GameObject wrongFXPrefab;
+    public float fxSpawnYOffset = 0.5f;
+
     [Range(0f, 1f)] public float hapticAmplitude = 0.5f;
     public float hapticDuration = 0.1f;
 
     void Awake()
     {
-        //Get or add an AudioSource on this GameObject
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -45,44 +48,43 @@ public class TriviaManager : MonoBehaviour
         // Load score from PlayerPrefs
         CurrentScore = PlayerPrefs.GetInt("TriviaScore", 0);
     }
+
     void Start()
     {
-        if (questions != null && questions.Count > 0)
-        {
-            UpdateScoreText();
+        // 1) Copy the master list into our working pool:
+        pool = new List<TriviaQuestion>(questions);
+
+        // 2) Shuffle so questions appear in random order:
+        Shuffle(pool);
+
+        // 3) Reset index & score display:
+        currentQuestionIndex = 0;
+        UpdateScoreText();
+
+        // 4) Kick off the first question:
+        if (pool.Count > 0)
             DisplayQuestion();
-        }
         else
-        {
             Debug.LogWarning("TriviaManager: No questions have been added!");
-        }
     }
 
-    /// <summary>
-    /// Populates UI from the current TriviaQuestion.
-    /// </summary>
+
     public void DisplayQuestion()
     {
-        // Clear previous feedback
         if (feedbackText != null)
             feedbackText.text = "";
 
-        // Safety checks:
-        if (questions == null || questions.Count == 0)
+        if (pool == null || pool.Count == 0)
         {
             Debug.LogWarning("TriviaManager: No questions available to display.");
             return;
         }
         if (currentQuestionIndex < 0) currentQuestionIndex = 0;
-        if (currentQuestionIndex >= questions.Count) currentQuestionIndex = questions.Count - 1;
+        if (currentQuestionIndex >= pool.Count) currentQuestionIndex = pool.Count - 1;
 
-        // Grab the current question
-        TriviaQuestion current = questions[currentQuestionIndex];
-
-        // Update question text
+        TriviaQuestion current = pool[currentQuestionIndex];
         questionText.text = current.questionText;
 
-        // Loop through each UI button and set its label + listener
         for (int i = 0; i < answerButtons.Length; i++)
         {
             if (i < current.answers.Length)
@@ -90,115 +92,143 @@ public class TriviaManager : MonoBehaviour
                 answerButtons[i].gameObject.SetActive(true);
                 TextMeshProUGUI btnText = answerButtons[i].GetComponentInChildren<TextMeshProUGUI>();
                 btnText.text = current.answers[i];
-
-                // Remove old listeners
                 answerButtons[i].onClick.RemoveAllListeners();
-
-                // Capture 'i' in a local variable for the lambda
                 int indexCopy = i;
-                answerButtons[i].onClick.AddListener(() =>
-                {
-                    CheckAnswer(indexCopy);
-                });
+                answerButtons[i].onClick.AddListener(() => CheckAnswer(indexCopy));
             }
             else
             {
-                // Hide any extra buttons
                 answerButtons[i].gameObject.SetActive(false);
             }
         }
     }
 
-    /// <summary>
-    /// Called by a button click, passing in the index of the chosen answer.
-    /// Spawns reward if correct, advances to next question, or finishes quiz.
-    /// </summary>
     public void CheckAnswer(int chosenIndex)
     {
-        TriviaQuestion current = questions[currentQuestionIndex];
+        if (pool == null || pool.Count == 0 || currentQuestionIndex < 0 || currentQuestionIndex >= pool.Count)
+            return;
+
+        TriviaQuestion current = pool[currentQuestionIndex];
         bool isCorrect = (chosenIndex == current.correctAnswerIndex);
 
         if (isCorrect)
         {
             CurrentScore++;
             UpdateScoreText();
-            // Correct answer actions
             Debug.Log($"Question {currentQuestionIndex + 1}: Correct!");
             if (feedbackText != null)
                 feedbackText.text = "Correct!";
 
+            // Play feedback animation if animator is assigned
+            if (feedbackAnimator != null)
+                feedbackAnimator.Play("FeedbackAnim", -1, 0f);
+
             if (audioSource != null && correctClip != null)
                 audioSource.PlayOneShot(correctClip);
-            //Haptic on both controllers (or just the active controller)
+
             SendHapticImpulse(hapticAmplitude, hapticDuration);
 
             StartCoroutine(FlashButtonColor(answerButtons[chosenIndex], Color.green, 0.3f));
             StartCoroutine(PopButtonAnimation(answerButtons[chosenIndex].transform));
 
-            if (rewardPrefab != null && rewardSpawnPoint != null)
+            // FX spawn position just above the selected button:
+            Vector3 btnPos = answerButtons[chosenIndex].transform.position;
+            Vector3 fxPos = btnPos + Vector3.up * fxSpawnYOffset;
+            Instantiate(correctFXPrefab, fxPos, Quaternion.identity);
+
+            // --- REWARD INSTANTIATION LOGIC ---
+            if (rewardSpawnPoint != null)
             {
-                Instantiate(rewardPrefab, rewardSpawnPoint.position, Quaternion.identity);
+                // Defensive: Check if rewardPrefabID exists
+                string rewardID = null;
+                // Try to get rewardPrefabID property (if it exists)
+                try
+                {
+                    rewardID = (string)current.GetType().GetField("rewardPrefabID").GetValue(current);
+                }
+                catch
+                {
+                    Debug.LogWarning("TriviaQuestion does not have a rewardPrefabID field.");
+                }
+
+                if (!string.IsNullOrEmpty(rewardID))
+                {
+                    GameObject prefab = GetRewardPrefab(rewardID);
+                    if (prefab != null)
+                    {
+                        var instance = Instantiate(prefab,
+                                                   rewardSpawnPoint.position,
+                                                   Quaternion.identity);
+
+                        var grab = instance.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+                        if (grab == null)
+                            instance.AddComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+
+                        instance.transform.SetParent(rewardSpawnPoint.parent, true);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("No rewardPrefabID specified for this question.");
+                }
             }
+            // --- END REWARD INSTANTIATION LOGIC ---
+
+            // Pause before showing next question
+            StartCoroutine(NextQuestionAfterDelay(1.0f));
+            return; // Prevent immediate advancement
         }
         else
         {
             Debug.Log($"Question {currentQuestionIndex + 1}: Wrong. You chose \"{current.answers[chosenIndex]}\"");
             if (feedbackText != null)
                 feedbackText.text = "Wrong—try again!";
+
+            // Play feedback animation if animator is assigned
+            if (feedbackAnimator != null)
+                feedbackAnimator.Play("FeedbackAnim", -1, 0f);
+
             if (audioSource != null && wrongClip != null)
                 audioSource.PlayOneShot(wrongClip);
 
-            SendHapticImpulse(hapticAmplitude * 0.5f, hapticDuration); // softer vibration
+            SendHapticImpulse(hapticAmplitude * 0.5f, hapticDuration);
 
             StartCoroutine(FlashButtonColor(answerButtons[chosenIndex], Color.red, 0.3f));
             StartCoroutine(PopButtonAnimation(answerButtons[chosenIndex].transform));
 
-        }
+            // FX spawn position just above the selected button for wrong answer:
+            Vector3 fxPos = answerButtons[chosenIndex].transform.position + Vector3.up * fxSpawnYOffset;
+            Instantiate(wrongFXPrefab, fxPos, Quaternion.identity);
 
-        // Advance index
-        currentQuestionIndex++;
-
-        // If more questions remain, display next; otherwise end or restart
-        if (currentQuestionIndex < questions.Count)
-        {
-            DisplayQuestion();
-        }
-        else
-        {
-            Debug.Log("Trivia complete! No more questions.");
-            // Option A: Disable all buttons
-            for (int i = 0; i < answerButtons.Length; i++)
-                answerButtons[i].gameObject.SetActive(false);
-
-            // Option B (uncomment to restart automatically):
-            // currentQuestionIndex = 0;
-            // DisplayQuestion();
-            // Update and show the EndQuizPanel
-            if (finalScoreText != null)
+            // Immediate advancement for wrong answers (if desired)
+            currentQuestionIndex++;
+            if (currentQuestionIndex < pool.Count)
             {
-                finalScoreText.text = "Your Score: " + CurrentScore;
+                DisplayQuestion();
             }
-
-            if (endQuizPanel != null)
+            else
             {
-                endQuizPanel.SetActive(true);
+                EndTrivia();
             }
         }
     }
-    /// <summary>
-    /// Sends a haptic impulse to the left and right controllers, if they exist.
-    /// </summary>
+
     private void SendHapticImpulse(float amplitude, float duration)
     {
-        // Find all XRController components under the XR Origin
         XRController[] controllers = FindObjectsOfType<XRController>();
         foreach (var ctrl in controllers)
         {
-            ctrl.SendHapticImpulse(amplitude, duration);
+            try
+            {
+                ctrl.SendHapticImpulse(amplitude, duration);
+            }
+            catch
+            {
+                // Ignore if not supported
+            }
         }
     }
 
-    // Add a helper method for score text
     private void SetScoreText(string text)
     {
         if (scoreText != null)
@@ -208,12 +238,10 @@ public class TriviaManager : MonoBehaviour
     private void UpdateScoreText()
     {
         SetScoreText($"Score: {CurrentScore}");
-        // Save score to PlayerPrefs
         PlayerPrefs.SetInt("TriviaScore", CurrentScore);
         PlayerPrefs.Save();
     }
 
-    // Optional: Call this to reset the saved score
     public void ResetScore()
     {
         CurrentScore = 0;
@@ -222,15 +250,12 @@ public class TriviaManager : MonoBehaviour
         UpdateScoreText();
     }
 
-    // Coroutine for simple button pop/scale animation
     private IEnumerator PopButtonAnimation(Transform buttonTransform)
     {
         Vector3 originalScale = buttonTransform.localScale;
         Vector3 popScale = originalScale * 1.15f;
         float duration = 0.1f;
         float t = 0f;
-
-        // Scale up
         while (t < duration)
         {
             buttonTransform.localScale = Vector3.Lerp(originalScale, popScale, t / duration);
@@ -238,8 +263,6 @@ public class TriviaManager : MonoBehaviour
             yield return null;
         }
         buttonTransform.localScale = popScale;
-
-        // Scale down
         t = 0f;
         while (t < duration)
         {
@@ -250,39 +273,68 @@ public class TriviaManager : MonoBehaviour
         buttonTransform.localScale = originalScale;
     }
 
-    // Add missing FlashButtonColor coroutine if not present
-    private IEnumerator FlashButtonColor(Button button, Color color, float duration)
+    private IEnumerator FlashButtonColor(Button button, Color flashColor, float duration)
     {
         var colors = button.colors;
-        Color originalColor = colors.normalColor;
-        colors.normalColor = color;
+        Color originalNormal = colors.normalColor;
+        Color originalHighlighted = colors.highlightedColor;
+
+        colors.normalColor = flashColor;
+        colors.highlightedColor = flashColor;
         button.colors = colors;
+
         yield return new WaitForSeconds(duration);
-        colors.normalColor = originalColor;
+
+        colors.normalColor = originalNormal;
+        colors.highlightedColor = originalHighlighted;
         button.colors = colors;
     }
+
     /// <summary>
-    /// Called when the player presses the “Restart Quiz” button.
-    /// Resets score, question index, hides the EndQuizPanel, re‐enables buttons, and shows the first question.
+    /// Randomizes the list in place.
     /// </summary>
-    public void RestartQuiz()
+    private void Shuffle<T>(List<T> list)
     {
-        // 1) Reset the score and update UI
-        CurrentScore = 0;
-        UpdateScoreText();
+        for (int i = 0; i < list.Count; i++)
+        {
+            int r = Random.Range(i, list.Count);
+            T tmp = list[i];
+            list[i] = list[r];
+            list[r] = tmp;
+        }
+    }
+    /// <summary>
+    /// Looks up the prefab by matching its name to rewardID.
+    /// </summary>
+    private GameObject GetRewardPrefab(string rewardID)
+    {
+        if (string.IsNullOrEmpty(rewardID))
+            return null;
+        foreach (var prefab in rewardPrefab)
+        {
+            if (prefab != null && prefab.name == rewardID)
+                return prefab;
+        }
+        Debug.LogWarning($"Reward prefab for ID '{rewardID}' not found!");
+        return null;
+    }
 
-        // 2) Reset question index
-        currentQuestionIndex = 0;
+    private IEnumerator NextQuestionAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        currentQuestionIndex++;
+        if (currentQuestionIndex < pool.Count)
+            DisplayQuestion();
+        else
+            EndTrivia();
+    }
 
-        // 3) Hide the EndQuizPanel
-        if (endQuizPanel != null)
-            endQuizPanel.SetActive(false);
-
-        // 4) Re-enable all answer buttons (in case any were hidden)
+    private void EndTrivia()
+    {
+        Debug.Log("All done!");
+        // Hide buttons / show “Complete” UI
         for (int i = 0; i < answerButtons.Length; i++)
-            answerButtons[i].gameObject.SetActive(true);
-
-        // 5) Display the first question again
-        DisplayQuestion();
+            answerButtons[i].gameObject.SetActive(false);
+        // Optionally show a "Complete" message or UI here
     }
 }
