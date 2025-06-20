@@ -1,73 +1,74 @@
 using UnityEngine;
-using UnityEngine.UI;               // for Button
-using TMPro;                        // for TMP_InputField & TextMeshProUGUI
-using UnityEngine.SceneManagement;  // for SceneManager.LoadScene
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using TMPro;
 
+/// <summary>
+/// Manages the login UI: captures username (and optional avatar choice), persists user settings, and transitions to the main trivia scene.
+/// </summary>
 public class LoginManager : MonoBehaviour
 {
     [Header("UI References")]
-    public TMP_InputField usernameInput; // drag UsernameInput here
-    public TMP_InputField passwordInput; // drag PasswordInput here
-    public Button loginButton;            // drag LoginButton here
-    public TextMeshProUGUI errormessageText;  // drag errorMessageText here
+    public TMP_InputField usernameInput;
+    public TMP_Dropdown avatarDropdown;   // optional avatar selection
+    public Button loginButton;
 
-    [Header("Demo Credentials")]
-    public string validUsername = "player";
-    public string validPassword = "pass123";
+    [Header("Scene Management")]
+    [Tooltip("Name of the scene to load after successful login")]
+    public string nextSceneName = "TriviaScene";
 
     void Start()
     {
-        loginButton.onClick.AddListener(OnLoginButtonClicked);
-        errormessageText.text = ""; // Clear feedback text at start
+        // Preload previously saved username and avatar index
+        usernameInput.text = PlayerPrefs.GetString("Username", "");
+        if (avatarDropdown != null)
+            avatarDropdown.value = PlayerPrefs.GetInt("AvatarIndex", 0);
+
+        // Hook up button listener
+        loginButton.onClick.RemoveAllListeners();
+        loginButton.onClick.AddListener(OnLoginClicked);
     }
 
-    void OnLoginButtonClicked()
+    /// <summary>
+    /// Called when the user clicks the Login button.
+    /// Validates inputs, saves to PlayerPrefs, and loads the next scene.
+    /// </summary>
+    public void OnLoginClicked()
     {
-        string username = usernameInput.text;
-        string password = passwordInput.text;
-
-        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+        string username = usernameInput.text.Trim();
+        if (string.IsNullOrEmpty(username))
         {
-            errormessageText.text = "Please enter both username and password.";
+            Debug.LogWarning("LoginManager: Username is empty.");
+            // Optionally show UI feedback here
             return;
         }
 
-        // Simulate a successful login (replace with actual authentication logic)
+        // Save username
         PlayerPrefs.SetString("Username", username);
-        PlayerPrefs.SetString("Password", password);
 
-        errormessageText.text = "Login successful!";
-
-        // Load the main game scene (replace with your actual scene name)
-        SceneManager.LoadScene("TriviaScene");
-    }
-    /// <summary>
-    /// Called when the user clicks “Login”. Reads the input fields, validates them,
-    /// and either loads the TriviaScene or displays an error message.
-    /// </summary>
-    private void OnLoginButtonPressed()
-    {
-        // 1) Read the user’s input
-        string enteredUser = "";
-        string enteredPass = "";
-
-        if (usernameInput != null)
-            enteredUser = usernameInput.text.Trim();  // Trim whitespace
-
-        if (passwordInput != null)
-            enteredPass = passwordInput.text;
-
-        // 2) Check credentials
-        if (enteredUser == validUsername && enteredPass == validPassword)
+        // Save avatar choice if available
+        if (avatarDropdown != null)
         {
-            // Credentials are correct → load the Trivia scene
-            SceneManager.LoadScene("TriviaScene");
+            PlayerPrefs.SetInt("AvatarIndex", avatarDropdown.value);
+        }
+
+        PlayerPrefs.Save();
+
+         // Direct load:
+         // if (!string.IsNullOrEmpty(nextSceneName))
+         // SceneManager.LoadScene(nextSceneName);
+         // Smooth transition:
+         if (!string.IsNullOrEmpty(nextSceneName) && SceneTransitionManager.Instance != null)
+         SceneTransitionManager.Instance.LoadScene(nextSceneName);
+
+        // Transition to the trivia scene
+        if (!string.IsNullOrEmpty(nextSceneName))
+        {
+            SceneManager.LoadScene(nextSceneName);
         }
         else
         {
-            // Invalid credentials → show an error
-            if (errormessageText != null)
-                errormessageText.text = "Invalid username or password";
+            Debug.LogError("LoginManager: nextSceneName not set.");
         }
     }
 }
