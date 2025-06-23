@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: e283b2bfeb3d3ab42bd38dad45497c2c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - questionText: {instanceID: 0}
+  - feedbackText: {instanceID: 0}
+  - scoreText: {instanceID: 0}
+  - rewardSpawnPoint: {instanceID: 0}
+  - correctClip: {fileID: 8300000, guid: bd296e1cf8bc1ec44ada3b1e3f44c750, type: 3}
+  - wrongClip: {fileID: 8300000, guid: c536e44dd97685144bc568fd799997ee, type: 3}
+  - audioSource: {instanceID: 0}
+  - correctFXPrefab: {fileID: 7575835835663318869, guid: 55f6302092f0e8645a4aeedb188701fd, type: 3}
+  - wrongFXPrefab: {fileID: 426488727241195433, guid: 687481caffb7d9041a441d52d4e003d4, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

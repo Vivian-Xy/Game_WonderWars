@@ -1026,6 +1026,7 @@ MonoBehaviour:
   fxSpawnYOffset: 0.3
   rewardPrefabs: []
   rewardSpawnPoint: {fileID: 0}
+  rewardSpawnClip: {fileID: 8300000, guid: fd6c9ed3051fe964aaca307405ce0def, type: 3}
   correctClip: {fileID: 8300000, guid: bd296e1cf8bc1ec44ada3b1e3f44c750, type: 3}
   wrongClip: {fileID: 8300000, guid: c536e44dd97685144bc568fd799997ee, type: 3}
   hapticAmplitude: 0.5
