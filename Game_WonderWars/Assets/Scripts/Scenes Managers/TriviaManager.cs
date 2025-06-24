@@ -131,6 +131,10 @@ public class TriviaManager : MonoBehaviour
                 });
             }
         }
+
+        // Restore unlockedCount from PlayerPrefs
+        foreach (var mp in monumentProgress)
+            mp.unlockedCount = PlayerPrefs.GetInt($"Unlocked_{mp.monumentID}", 0);
     }
     #endregion
 
@@ -220,6 +224,7 @@ public class TriviaManager : MonoBehaviour
                 // Update progress
                 var mp = monumentProgress.First(m => m.monumentID == rewardID);
                 mp.unlockedCount++;
+                PlayerPrefs.SetInt($"Unlocked_{mp.monumentID}", mp.unlockedCount);
             }
         }
         else

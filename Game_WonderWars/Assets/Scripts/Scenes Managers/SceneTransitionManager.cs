@@ -52,12 +52,10 @@ public class SceneTransitionManager : MonoBehaviour
             Debug.LogError("SceneTransitionManager: LoadScene called with empty sceneName");
             return;
         }
-        // Ensure the TransitionCanvas is active before starting the coroutine
+        // If for some reason this GameObject was disabled, re-enable it:
         if (!gameObject.activeInHierarchy)
-        {
-            Debug.LogError("SceneTransitionManager: TransitionCanvas is inactive! Cannot start coroutine.");
-            return;
-        }
+            gameObject.SetActive(true);
+
         StartCoroutine(PerformTransition(sceneName));
     }
 
@@ -66,7 +64,7 @@ public class SceneTransitionManager : MonoBehaviour
     {
         // Fade to black
         if (fadeImage != null)
-            yield return Fade(1f, 0f); // Fix: fade from opaque (1) to transparent (0) before loading
+            yield return Fade(1f, 0f); // fade from opaque (1) to transparent (0) before loading
 
         // Load the scene asynchronously
         AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
@@ -75,7 +73,7 @@ public class SceneTransitionManager : MonoBehaviour
 
         // Fade back in
         if (fadeImage != null)
-            yield return Fade(0f, 1f); // Fix: fade from transparent (0) to opaque (1) after loading
+            yield return Fade(0f, 1f); // fade from transparent (0) to opaque (1) after loading
     }
 
     // Coroutine to interpolate alpha of fadeImage
