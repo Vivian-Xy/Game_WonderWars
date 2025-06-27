@@ -291,7 +291,7 @@ GameObject:
   - component: {fileID: 49464175}
   - component: {fileID: 49464174}
   m_Layer: 5
-  m_Name: ErrorMessageText
+  m_Name: FeedbackText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1048,6 +1048,7 @@ GameObject:
   - component: {fileID: 652246409}
   - component: {fileID: 652246408}
   - component: {fileID: 652246412}
+  - component: {fileID: 652246413}
   m_Layer: 5
   m_Name: LoginCanvas
   m_TagString: Untagged
@@ -1162,6 +1163,22 @@ MonoBehaviour:
   avatarDropdown: {fileID: 0}
   loginButton: {fileID: 41005845}
   nextSceneName: TriviaScene
+--- !u!114 &652246413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652246407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa4d7b650c2f64a479712602ea06de25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emailInput: {fileID: 1650021248}
+  passwordInput: {fileID: 940850679}
+  feedbackText: {fileID: 49464174}
+  backend: {fileID: 2077003770}
 --- !u!1 &660142751
 GameObject:
   m_ObjectHideFlags: 0
@@ -2245,7 +2262,7 @@ GameObject:
   - component: {fileID: 1650021249}
   - component: {fileID: 1650021248}
   m_Layer: 5
-  m_Name: UsernameInputField
+  m_Name: EmailInput
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2630,7 +2647,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter username...
+  m_text: Enter email...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2806,6 +2823,51 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d074d73abe6808440bc68754a90450bd, type: 3}
+--- !u!1 &2077003769
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2077003771}
+  - component: {fileID: 2077003770}
+  m_Layer: 0
+  m_Name: Backend
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2077003770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2077003769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18d5a5261d6e95844a3a72c237a36dc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverURL: http://localhost:5000/api
+--- !u!4 &2077003771
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2077003769}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.01284, y: 0.00334, z: 29.99689}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2098451446
 GameObject:
   m_ObjectHideFlags: 0
@@ -3011,3 +3073,4 @@ SceneRoots:
   - {fileID: 1944732178}
   - {fileID: 1652993319}
   - {fileID: 2098451449}
+  - {fileID: 2077003771}

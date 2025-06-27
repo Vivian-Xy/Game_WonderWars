@@ -1,0 +1,38 @@
+# Code Citations
+
+## License: unknown
+https://github.com/hsiunien/StudyTest/tree/c425e6a9ba5d47b909109f444b06530ee9236579/Unity/CameraMoving/Assets/Plugins/Demigiant/DOTween/Modules/DOTweenModuleEPOOutline.cs
+
+```
+> DODilateShift(this Outlinable.OutlineProperties target, float endValue, float duration, bool snapping = false)
+        {
+            var tweener = DOTween.To(() => target.DilateShift, x => target.DilateShift = x, endValue, duration);
+            tweener.SetOptions(snapping
+```
+
+
+## License: unknown
+https://github.com/louiserhiannon/XRDev-APR21-PRJ-EarthElevator/tree/8eba5cfe6d707a9b12cfc67619960e75194dfdb3/XRDEV-PRJ-EarthElevator2/Assets/Plugins/Demigiant/DOTween/Modules/DOTweenModuleEPOOutline.cs
+
+```
+this Outlinable.OutlineProperties target, float endValue, float duration, bool snapping = false)
+        {
+            var tweener = DOTween.To(() => target.DilateShift, x => target.DilateShift = x, endValue, duration);
+            tweener.SetOptions(snapping).SetTarget
+```
+
+
+## License: unknown
+https://github.com/bizazin/Snake-Cyborgs-Pro/tree/c1e37fb71d9290231defc958f5997b88070c4d75/Assets/Plugins/Demigiant/DOTween/Modules/DOTweenModuleEPOOutline.cs
+
+```
+.SetTarget(target);
+            return tweener;
+        }
+
+        /// <summary>
+        /// Controls the amount of dilation applied to the outline
+        /// </summary>
+        public static TweenerCore<float, float, FloatOptions> DODilateShift(this Outliner target, float endValue, float
+```
+
