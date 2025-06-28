@@ -108,10 +108,10 @@ public class TriviaManager : MonoBehaviour
         InitializeMonumentProgress();
 
         // Display first question
-        if (pool.Count > 0)
+        if (pool != null && pool.Count > 0)
             DisplayQuestion();
         else
-            Debug.LogWarning("TriviaManager: No questions available.");
+            Debug.LogWarning("TriviaManager: No questions available. Check that your questions list is populated.");
     }
 
     #region Initialization
@@ -225,6 +225,12 @@ public class TriviaManager : MonoBehaviour
                 var mp = monumentProgress.First(m => m.monumentID == rewardID);
                 mp.unlockedCount++;
                 PlayerPrefs.SetInt($"Unlocked_{mp.monumentID}", mp.unlockedCount);
+
+                // After awarding the piece, show a progress card
+                string pieceName = prefab.name + " Piece";
+                Sprite pieceSprite = Resources.Load<Sprite>($"Monuments/{pieceName}");
+                if (ProgressCardSpawner.Instance != null)
+                    ProgressCardSpawner.Instance.SpawnCard(pieceName, pieceSprite);
             }
         }
         else

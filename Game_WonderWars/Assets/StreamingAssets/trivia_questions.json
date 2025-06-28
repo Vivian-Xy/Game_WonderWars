@@ -1,0 +1,148 @@
+[
+  {
+    "id": "q1",
+    "questionText": "Which city is home to the Colosseum?",
+    "choices": [
+      "Rome",
+      "Athens",
+      "Cairo",
+      "Paris"
+    ],
+    "correctIndex": 0,
+    "rewardPiece": "Colosseum Piece"
+  },
+  {
+    "id": "q2",
+    "questionText": "In which country is the Great Wall located?",
+    "choices": ["India", "China", "Mexico", "Egypt"],
+    "correctIndex": 1,
+    "rewardPiece": "GreatWall Piece"
+  },
+  {
+    "id": "q3",
+    "questionText": "What is the tallest mountain in the world?",
+    "choices": ["K2", "Mount Everest", "Kilimanjaro", "Denali"],
+    "correctIndex": 1,
+    "rewardPiece": "Everest Piece"
+  },
+  {
+    "id": "q4",
+    "questionText": "Which river flows through Egypt?",
+    "choices": ["Amazon", "Nile", "Yangtze", "Danube"],
+    "correctIndex": 1,
+    "rewardPiece": "Nile Piece"
+  },
+  {
+    "id": "q5",
+    "questionText": "Which country is famous for the Eiffel Tower?",
+    "choices": ["Italy", "France", "Spain", "Germany"],
+    "correctIndex": 1,
+    "rewardPiece": "EiffelTower Piece"
+  },
+  {
+    "id": "q6",
+    "questionText": "Machu Picchu is located in which country?",
+    "choices": ["Peru", "Brazil", "Chile", "Argentina"],
+    "correctIndex": 0,
+    "rewardPiece": "MachuPicchu Piece"
+  },
+  {
+    "id": "q7",
+    "questionText": "Which ancient wonder was located in Babylon?",
+    "choices": ["Hanging Gardens", "Colossus of Rhodes", "Lighthouse of Alexandria", "Temple of Artemis"],
+    "correctIndex": 0,
+    "rewardPiece": "HangingGardens Piece"
+  },
+  {
+    "id": "q8",
+    "questionText": "Which city is known as the 'Big Apple'?",
+    "choices": ["Los Angeles", "London", "New York", "Sydney"],
+    "correctIndex": 2,
+    "rewardPiece": "BigApple Piece"
+  },
+  {
+    "id": "q9",
+    "questionText": "The Taj Mahal is located in which Indian city?",
+    "choices": ["Delhi", "Agra", "Mumbai", "Jaipur"],
+    "correctIndex": 1,
+    "rewardPiece": "TajMahal Piece"
+  },
+  {
+    "id": "q10",
+    "questionText": "Which country is home to the Acropolis?",
+    "choices": ["Italy", "Greece", "Turkey", "Egypt"],
+    "correctIndex": 1,
+    "rewardPiece": "Acropolis Piece"
+  },
+  {
+    "id": "q11",
+    "questionText": "Which desert is the largest in the world?",
+    "choices": ["Sahara", "Gobi", "Kalahari", "Arabian"],
+    "correctIndex": 0,
+    "rewardPiece": "Sahara Piece"
+  },
+  {
+    "id": "q12",
+    "questionText": "Which city is famous for its canals and gondolas?",
+    "choices": ["Venice", "Amsterdam", "Bangkok", "Copenhagen"],
+    "correctIndex": 0,
+    "rewardPiece": "Venice Piece"
+  },
+  {
+    "id": "q13",
+    "questionText": "Which monument is located in Rio de Janeiro?",
+    "choices": ["Statue of Liberty", "Christ the Redeemer", "Eiffel Tower", "Big Ben"],
+    "correctIndex": 1,
+    "rewardPiece": "Redeemer Piece"
+  },
+  {
+    "id": "q14",
+    "questionText": "Which country is known for the pyramids of Giza?",
+    "choices": ["Mexico", "Egypt", "Peru", "China"],
+    "correctIndex": 1,
+    "rewardPiece": "Giza Piece"
+  },
+  {
+    "id": "q15",
+    "questionText": "Which city hosted the 2008 Summer Olympics?",
+    "choices": ["London", "Beijing", "Athens", "Sydney"],
+    "correctIndex": 1,
+    "rewardPiece": "BeijingOlympics Piece"
+  },
+  {
+    "id": "q16",
+    "questionText": "Which country is home to the Sydney Opera House?",
+    "choices": ["New Zealand", "Australia", "Canada", "USA"],
+    "correctIndex": 1,
+    "rewardPiece": "SydneyOpera Piece"
+  },
+  {
+    "id": "q17",
+    "questionText": "Which city is the capital of Japan?",
+    "choices": ["Kyoto", "Tokyo", "Osaka", "Hiroshima"],
+    "correctIndex": 1,
+    "rewardPiece": "Tokyo Piece"
+  },
+  {
+    "id": "q18",
+    "questionText": "Which famous wall divides a European city?",
+    "choices": ["Berlin Wall", "Hadrian's Wall", "Great Wall", "Western Wall"],
+    "correctIndex": 0,
+    "rewardPiece": "BerlinWall Piece"
+  },
+  {
+    "id": "q19",
+    "questionText": "Which city is known for the Golden Gate Bridge?",
+    "choices": ["Los Angeles", "San Francisco", "Seattle", "Chicago"],
+    "correctIndex": 1,
+    "rewardPiece": "GoldenGate Piece"
+  },
+  {
+    "id": "q20",
+    "questionText": "Which country is home to Stonehenge?",
+    "choices": ["Ireland", "England", "Scotland", "Wales"],
+    "correctIndex": 1,
+    "rewardPiece": "Stonehenge Piece"
+  }
+  
+]

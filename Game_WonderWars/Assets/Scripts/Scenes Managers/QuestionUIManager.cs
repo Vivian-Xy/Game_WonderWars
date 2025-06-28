@@ -1,60 +1,83 @@
 using UnityEngine;
-using UnityEngine.UI;
+using System.IO;
 using System.Collections.Generic;
+#if USE_NEWTONSOFT
+using Newtonsoft.Json;
+#endif
 
-public class QuestionUIManager : MonoBehaviour
+public class QuestionManager : MonoBehaviour
 {
-    public Text questionText;
-    public List<Button> optionButtons;
-    private BackendManager.Question currentQuestion;
-    private BackendManager backend;
-    private string userId = "USER_ID_FROM_LOGIN";
+    public static QuestionManager Instance { get; private set; }
+    public List<TriviaQuestion> allQuestions;
 
     void Awake()
     {
-        backend = FindObjectOfType<BackendManager>();
-        if (backend == null)
-            Debug.LogError("BackendManager not found in scene!");
-    }
-
-    public void DisplayQuestion(BackendManager.Question question)
-    {
-        currentQuestion = question;
-        questionText.text = question.questionText;
-
-        for (int i = 0; i < optionButtons.Count; i++)
+        // Singleton pattern
+        if (Instance != null && Instance != this)
         {
-            int index = i;
-            if (i < question.options.Count)
-            {
-                optionButtons[i].gameObject.SetActive(true);
-                optionButtons[i].GetComponentInChildren<Text>().text = question.options[i];
-                optionButtons[i].onClick.RemoveAllListeners();
-                optionButtons[i].onClick.AddListener(() => OnOptionSelected(index));
-            }
-            else
-            {
-                optionButtons[i].gameObject.SetActive(false);
-            }
+            Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        LoadQuestions();
     }
 
-    void OnOptionSelected(int index)
+    void LoadQuestions()
     {
-        string selected = currentQuestion.options[index];
-        bool isCorrect = selected == currentQuestion.correctAnswer;
+        string fileName = "trivia_questions.json";
+        string fullPath = Path.Combine(Application.streamingAssetsPath, fileName);
 
-        Debug.Log(isCorrect ? "✅ Correct!" : "❌ Wrong");
-
-        if (isCorrect)
+        if (!File.Exists(fullPath))
         {
-            // If monumentUnlocked is not present, add it to BackendManager.Question and your backend
-            string monumentId = "";
-            if (currentQuestion.GetType().GetField("monumentUnlocked") != null)
-                monumentId = (string)currentQuestion.GetType().GetField("monumentUnlocked").GetValue(currentQuestion);
-
-            StartCoroutine(backend.UpdateProgress(userId, currentQuestion.questionText, monumentId, 10));
-            // Show monument in game or continue
+            Debug.LogError($"[QuestionManager] File not found: {fullPath}");
+            allQuestions = new List<TriviaQuestion>();
+            return;
         }
+
+        string json = File.ReadAllText(fullPath);
+
+        // Deserialize
+    #if USE_NEWTONSOFT
+        allQuestions = JsonConvert.DeserializeObject<List<TriviaQuestion>>(json);
+    #else
+        // If you didn’t install Newtonsoft, wrap your JSON in {"questions": [...]}
+        try
+        {
+            var wrapper = JsonUtility.FromJson<TriviaQuestionList>(json);
+            allQuestions = wrapper != null && wrapper.questions != null
+                ? new List<TriviaQuestion>(wrapper.questions)
+                : new List<TriviaQuestion>();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[QuestionManager] JSON parse error: {ex.Message}");
+            allQuestions = new List<TriviaQuestion>();
+        }
+    #endif
+
+        Debug.Log($"[QuestionManager] Loaded {allQuestions.Count} questions.");
     }
+
+    /// <summary>
+    /// Returns a random question from the list.
+    /// </summary>
+    public TriviaQuestion GetRandomQuestion()
+    {
+        if (allQuestions == null || allQuestions.Count == 0)
+        {
+            Debug.LogWarning("[QuestionManager] No questions loaded.");
+            return null;
+        }
+        int index = Random.Range(0, allQuestions.Count);
+        return allQuestions[index];
+    }
+}
+
+// Only needed if not using Newtonsoft
+[System.Serializable]
+public class TriviaQuestionList
+{
+    public TriviaQuestion[] questions;
 }

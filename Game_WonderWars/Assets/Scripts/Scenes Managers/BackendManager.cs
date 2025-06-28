@@ -178,14 +178,26 @@ public class BackendManager : MonoBehaviour
 
         if (req.result == UnityWebRequest.Result.Success)
         {
-            // wrap array into object for JsonUtility
+            // Try to parse the JSON response into your QuestionList class
             string json = "{\"questions\":" + req.downloadHandler.text + "}";
-            var list = JsonUtility.FromJson<QuestionList>(json).questions;
+            QuestionList qList = null;
+            try
+            {
+                qList = JsonUtility.FromJson<QuestionList>(json);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("JSON parse error: " + ex.Message);
+            }
+            // If parsing succeeded and questions exist, use them; otherwise, return an empty list
+            var list = qList != null && qList.questions != null ? qList.questions : new List<Question>();
             callback?.Invoke(list);
         }
         else
         {
+            // If the request failed, log the error and remind to check the backend server
             Debug.LogError("GetQuestions failed: " + req.error);
+            Debug.LogError("Check that your backend server is running and accessible at: " + serverURL);
             callback?.Invoke(new List<Question>());
         }
     }

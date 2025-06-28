@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 public class TriviaUI : MonoBehaviour
 {
@@ -21,6 +22,12 @@ public class TriviaUI : MonoBehaviour
 
     void Start()
     {
+        // Check for StreamingAssets JSON file (for debugging only; not used by backend)
+        string path = Path.Combine(Application.streamingAssetsPath, "trivia_questions.json");
+        Debug.Log("Questions file path: " + path);
+        if (!File.Exists(path))
+            Debug.LogWarning("JSON not found in StreamingAssets! (This is only needed if you load questions locally)");
+
         userId = PlayerPrefs.GetString("userId");
         feedbackText.text = "";
         nextButton.interactable = false;
@@ -31,12 +38,29 @@ public class TriviaUI : MonoBehaviour
 
     void OnQuestionsLoaded(List<BackendManager.Question> list)
     {
+        if (list == null || list.Count == 0)
+        {
+            feedbackText.text = "No questions available.";
+            foreach (var btn in optionButtons)
+                btn.gameObject.SetActive(false);
+            nextButton.interactable = false;
+            return;
+        }
         questions = list;
         ShowQuestion(0);
     }
 
     void ShowQuestion(int index)
     {
+        if (questions == null || questions.Count == 0 || index < 0 || index >= questions.Count)
+        {
+            feedbackText.text = "No more questions.";
+            foreach (var btn in optionButtons)
+                btn.gameObject.SetActive(false);
+            nextButton.interactable = false;
+            return;
+        }
+
         currentIndex = index;
         feedbackText.text = "";
         nextButton.interactable = false;
@@ -47,11 +71,21 @@ public class TriviaUI : MonoBehaviour
         for (int i = 0; i < optionButtons.Count; i++)
         {
             var btn = optionButtons[i];
-            btn.GetComponentInChildren<TMP_Text>().text = q.options[i];
-            btn.onClick.RemoveAllListeners();
-            int choice = i;
-            btn.onClick.AddListener(() => OnOptionSelected(q, choice));
-            btn.interactable = true;
+            if (q.options != null && i < q.options.Count)
+            {
+                btn.gameObject.SetActive(true);
+                var txt = btn.GetComponentInChildren<TMP_Text>();
+                if (txt != null)
+                    txt.text = q.options[i];
+                btn.onClick.RemoveAllListeners();
+                int choice = i;
+                btn.onClick.AddListener(() => OnOptionSelected(q, choice));
+                btn.interactable = true;
+            }
+            else
+            {
+                btn.gameObject.SetActive(false);
+            }
         }
     }
 
