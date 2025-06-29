@@ -73,3 +73,98 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Ignore backup files
+*.bak
+
+# Ignore documentation folder
+/Docs/
+
+# Ignore downloaded textures outside Assets/
+*.png
+*.jpg
+*.jpeg
+*.tga
+*.psd
+*.tiff
+*.bmp
+*.gif
+*.exr
+*.hdr
+
+# But keep textures inside Assets/ (Unity default)
+!/[Aa]ssets/**/*.png
+!/[Aa]ssets/**/*.jpg
+!/[Aa]ssets/**/*.jpeg
+!/[Aa]ssets/**/*.tga
+!/[Aa]ssets/**/*.psd
+!/[Aa]ssets/**/*.tiff
+!/[Aa]ssets/**/*.bmp
+!/[Aa]ssets/**/*.gif
+!/[Aa]ssets/**/*.exr
+!/[Aa]ssets/**/*.hdr
+
+# Ignore downloaded audio files outside Assets/
+*.mp3
+*.wav
+*.ogg
+*.flac
+*.aiff
+*.aac
+
+# Ignore downloaded video files outside Assets/
+*.mp4
+*.mov
+*.avi
+*.wmv
+*.mkv
+*.webm
+
+# Ignore downloaded 3D model files outside Assets/
+*.fbx
+*.obj
+*.blend
+*.dae
+*.3ds
+*.stl
+*.ply
+*.gltf
+*.glb
+
+# Ignore archives and compressed files
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Ignore generic Downloads folder
+/Downloads/
+
+# Ignore grass, flower, ground, demoscene, rocks, sand, wood, mud, cobblestone, shell, snow, and terrain files/folders outside Assets/
+*grass*
+*Grass*
+*flower*
+*Flower*
+*ground*
+*Ground*
+*demoscene*
+*Demoscene*
+*rock*
+*Rock*
+*sand*
+*Sand*
+*wood*
+*Wood*
+*asphalt*
+*Asphalt*
+*mud*
+*Mud*
+*cobblestone*
+*Cobblestone*
+*shell*
+*Shell*
+*snow*
+*Snow*
+*terrain*
+*Terrain*

@@ -1,122 +1,148 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
-public class TriviaUI : MonoBehaviour
+public class TriviaUIController : MonoBehaviour
 {
-    [Header("UI Refs")]
-    public TMP_Text questionText;
-    public List<Button> optionButtons; // size 4
-    public TMP_Text feedbackText;
-    public Button nextButton;
+    [Header("UI References")]
+    public TextMeshProUGUI questionText;
+    public Button[] answerButtons; // Assign AnswerButton1–4 in Inspector
+    public GameObject progressCard; // Optional reward panel
 
-    [Header("Backend")]
-    public BackendManager backend;
-
-    private List<BackendManager.Question> questions;
-    private int currentIndex = 0;
-    private string userId;
+    private QuestionData currentQuestion; // Fix: should be a single QuestionData, not a list
 
     void Start()
     {
-        // Check for StreamingAssets JSON file (for debugging only; not used by backend)
-        string path = Path.Combine(Application.streamingAssetsPath, "trivia_questions.json");
-        Debug.Log("Questions file path: " + path);
-        if (!File.Exists(path))
-            Debug.LogWarning("JSON not found in StreamingAssets! (This is only needed if you load questions locally)");
-
-        userId = PlayerPrefs.GetString("userId");
-        feedbackText.text = "";
-        nextButton.interactable = false;
-        nextButton.onClick.AddListener(LoadNextQuestion);
-
-        StartCoroutine(backend.GetQuestions(OnQuestionsLoaded));
+        ShowNextQuestion();
     }
 
-    void OnQuestionsLoaded(List<BackendManager.Question> list)
+    public void ShowNextQuestion()
     {
-        if (list == null || list.Count == 0)
+        // Defensive: check if QuestionManager.Instance exists
+        if (QuestionManager.Instance == null)
         {
-            feedbackText.text = "No questions available.";
-            foreach (var btn in optionButtons)
+            Debug.LogError("QuestionManager.Instance is null!");
+            questionText.text = "No question manager found.";
+            foreach (var btn in answerButtons)
                 btn.gameObject.SetActive(false);
-            nextButton.interactable = false;
-            return;
-        }
-        questions = list;
-        ShowQuestion(0);
-    }
-
-    void ShowQuestion(int index)
-    {
-        if (questions == null || questions.Count == 0 || index < 0 || index >= questions.Count)
-        {
-            feedbackText.text = "No more questions.";
-            foreach (var btn in optionButtons)
-                btn.gameObject.SetActive(false);
-            nextButton.interactable = false;
             return;
         }
 
-        currentIndex = index;
-        feedbackText.text = "";
-        nextButton.interactable = false;
+        currentQuestion = QuestionManager.Instance.GetRandomQuestion();
 
-        var q = questions[index];
-        questionText.text = q.questionText;
-
-        for (int i = 0; i < optionButtons.Count; i++)
+        if (currentQuestion == null)
         {
-            var btn = optionButtons[i];
-            if (q.options != null && i < q.options.Count)
+            Debug.LogWarning("No question available.");
+            questionText.text = "No question available.";
+            foreach (var btn in answerButtons)
+                btn.gameObject.SetActive(false);
+            return;
+        }
+
+        questionText.text = currentQuestion.questionText;
+        Debug.Log($"Loaded Question: {currentQuestion.questionText}");
+
+        for (int i = 0; i < answerButtons.Length; i++)
+        {
+            int index = i;
+
+            // Defensive: check answers list
+            if (currentQuestion.answers != null && currentQuestion.answers.Length > index)
             {
-                btn.gameObject.SetActive(true);
-                var txt = btn.GetComponentInChildren<TMP_Text>();
-                if (txt != null)
-                    txt.text = q.options[i];
-                btn.onClick.RemoveAllListeners();
-                int choice = i;
-                btn.onClick.AddListener(() => OnOptionSelected(q, choice));
-                btn.interactable = true;
+                answerButtons[i].gameObject.SetActive(true);
+                TextMeshProUGUI label = answerButtons[i].GetComponentInChildren<TextMeshProUGUI>();
+                if (label != null)
+                {
+                    label.text = currentQuestion.answers[index];
+                    Debug.Log($"Set AnswerButton {i + 1}: {label.text}");
+                }
+                else
+                {
+                    Debug.LogWarning($"AnswerButton {i + 1} has no TextMeshProUGUI child!");
+                }
+                answerButtons[i].onClick.RemoveAllListeners();
+                answerButtons[i].onClick.AddListener(() => OnChoiceSelected(index));
+                answerButtons[i].interactable = true;
             }
             else
             {
-                btn.gameObject.SetActive(false);
+                answerButtons[i].gameObject.SetActive(false);
             }
         }
     }
 
-    void OnOptionSelected(BackendManager.Question q, int choice)
+    public void OnChoiceSelected(int selectedIndex)
     {
-        string selected = q.options[choice];
-        bool correct = selected == q.correctAnswer;
-        feedbackText.text = correct ? "Correct!" : "Wrong!";
-        foreach (var btn in optionButtons) btn.interactable = false;
-
-        if (correct)
+        // Defensive: check answers list and index
+        bool isCorrect = false;
+        if (currentQuestion.answers != null && selectedIndex >= 0 && selectedIndex < currentQuestion.answers.Length)
         {
-            StartCoroutine(backend.UpdateProgress(
-                userId, q.id, q.monumentUnlocked, 10, OnProgressUpdated
-            ));
+            isCorrect = string.Equals(
+                currentQuestion.answers[selectedIndex].Trim(),
+                currentQuestion.answers[currentQuestion.correctAnswerIndex].Trim(),
+                System.StringComparison.OrdinalIgnoreCase
+            );
+        }
+        else
+        {
+            Debug.LogWarning($"Selected answer index {selectedIndex} is out of range or answers list is null.");
         }
 
-        nextButton.interactable = true;
+        Debug.Log($"You selected {selectedIndex} → {(isCorrect ? "Correct" : "Wrong")}");
+
+        // Highlight the selected button (optional visual feedback)
+        HighlightAnswers(selectedIndex);
+
+        // If correct, reward
+        if (isCorrect)
+        {
+            RewardPlayer(currentQuestion.rewardPrefabID);
+        }
+
+        // Go back to dashboard after short delay
+        StartCoroutine(ReturnToDashboardAfterDelay(1.5f));
     }
 
-    void OnProgressUpdated(bool success, string resp)
+    void HighlightAnswers(int selectedIndex)
     {
-        if (!success) Debug.LogError("Progress update failed: " + resp);
+        for (int i = 0; i < answerButtons.Length; i++)
+        {
+            var colors = answerButtons[i].colors;
+            if (i == currentQuestion.correctAnswerIndex)
+                colors.normalColor = Color.green;
+            else if (i == selectedIndex)
+                colors.normalColor = Color.red;
+            else
+                colors.normalColor = Color.white;
+
+            answerButtons[i].colors = colors;
+        }
     }
 
-    void LoadNextQuestion()
+    void RewardPlayer(string pieceName)
     {
-        int next = currentIndex + 1;
-        if (next < questions.Count)
-            ShowQuestion(next);
-        else
-            feedbackText.text = "All done!";
+        Debug.Log($"🎁 Player earned: {pieceName}");
+        if (PlayerDataManager.Instance != null)
+            PlayerDataManager.Instance.AddPiece(pieceName);
+
+        if (progressCard != null)
+        {
+            progressCard.SetActive(true);
+        }
+    }
+
+    IEnumerator ReturnToDashboardAfterDelay(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        SceneManager.LoadScene("DashboardScene"); // Adjust scene name if needed
+    }
+
+    // Optional manual back button
+    public void BackToDashboard()
+    {
+        SceneManager.LoadScene("DashboardScene");
     }
 }

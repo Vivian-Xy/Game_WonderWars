@@ -80,6 +80,11 @@ public class AuthUIManager : MonoBehaviour
 
     public void GoToRegister()
     {
-        SceneManager.LoadScene("Register");
+        SceneManager.LoadScene("RegisterScene");
+    }
+
+    public void GoToLogin()
+    {
+        SceneManager.LoadScene("LoginScene");
     }
 }

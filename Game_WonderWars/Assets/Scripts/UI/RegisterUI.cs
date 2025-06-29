@@ -66,7 +66,7 @@ public class RegistrationController : MonoBehaviour
 
     public void GoToLogin()
     {
-        SceneManager.LoadScene("Login");
+        SceneManager.LoadScene("LoginScene");
     }
 }
 

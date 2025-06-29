@@ -17,6 +17,8 @@ public class SceneTransitionManager : MonoBehaviour
     [Tooltip("Duration of fade in seconds")]    
     public float fadeDuration = 0.5f;
 
+    public GameObject transitionCanvas; // Assign this in the Inspector
+
     private void Awake()
     {
         // Implement singleton pattern
@@ -52,11 +54,33 @@ public class SceneTransitionManager : MonoBehaviour
             Debug.LogError("SceneTransitionManager: LoadScene called with empty sceneName");
             return;
         }
-        // If for some reason this GameObject was disabled, re-enable it:
-        if (!gameObject.activeInHierarchy)
-            gameObject.SetActive(true);
 
-        StartCoroutine(PerformTransition(sceneName));
+        // Use transitionCanvas if assigned, otherwise fallback to this GameObject
+        GameObject canvasObj = transitionCanvas != null ? transitionCanvas : gameObject;
+
+        if (!canvasObj.activeInHierarchy)
+        {
+            Debug.LogWarning("TransitionCanvas is inactive—can't start coroutine.");
+            return;
+        }
+
+        StartCoroutine(FadeOutAndLoadScene(sceneName));
+    }
+
+    private IEnumerator FadeOutAndLoadScene(string sceneName)
+    {
+        // Fade out (to black)
+        if (fadeImage != null)
+            yield return Fade(1f, 0f);
+
+        // Load the scene asynchronously
+        AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
+        while (!op.isDone)
+            yield return null;
+
+        // Fade back in
+        if (fadeImage != null)
+            yield return Fade(0f, 1f);
     }
 
     // Internal coroutine to handle fade out, load, and fade in

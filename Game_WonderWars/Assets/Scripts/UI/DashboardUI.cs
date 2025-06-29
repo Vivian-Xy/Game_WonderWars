@@ -92,3 +92,6 @@ public class DashboardUI : MonoBehaviour
         public string[] unlockedMonuments;
     }
 }
+
+/* Removed duplicate DashboardUI class definition. 
+   If you want StartTrivia() functionality, move it into the main DashboardUI class above. */

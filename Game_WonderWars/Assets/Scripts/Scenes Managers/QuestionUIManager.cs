@@ -1,83 +1,72 @@
+using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System.Collections.Generic;
-#if USE_NEWTONSOFT
-using Newtonsoft.Json;
-#endif
+using Newtonsoft.Json; // Add this for Newtonsoft.Json support
 
 public class QuestionManager : MonoBehaviour
 {
-    public static QuestionManager Instance { get; private set; }
-    public List<TriviaQuestion> allQuestions;
+    public static QuestionManager Instance;
+
+    private List<QuestionData> allQuestions;
 
     void Awake()
     {
-        // Singleton pattern
-        if (Instance != null && Instance != this)
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            LoadQuestions();
+        }
+        else
         {
             Destroy(gameObject);
-            return;
         }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        LoadQuestions();
     }
 
     void LoadQuestions()
     {
-        string fileName = "trivia_questions.json";
-        string fullPath = Path.Combine(Application.streamingAssetsPath, fileName);
+        string filePath = Path.Combine(Application.streamingAssetsPath, "trivia_questions.json");
 
-        if (!File.Exists(fullPath))
+        if (File.Exists(filePath))
         {
-            Debug.LogError($"[QuestionManager] File not found: {fullPath}");
-            allQuestions = new List<TriviaQuestion>();
-            return;
+            string json = File.ReadAllText(filePath);
+
+            try
+            {
+                allQuestions = JsonConvert.DeserializeObject<List<QuestionData>>(json);
+                Debug.Log($"Loaded {allQuestions.Count} questions.");
+                // Debug log the first question's answers for troubleshooting
+                if (allQuestions.Count > 0)
+                {
+                    var q = allQuestions[0];
+                    Debug.Log($"First question: {q.questionText}");
+                    if (q.answers != null)
+                        Debug.Log($"Answers: {string.Join(", ", q.answers)}");
+                    else
+                        Debug.LogWarning("First question's answers field is null.");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Failed to parse trivia_questions.json: " + ex.Message);
+                allQuestions = new List<QuestionData>();
+            }
         }
-
-        string json = File.ReadAllText(fullPath);
-
-        // Deserialize
-    #if USE_NEWTONSOFT
-        allQuestions = JsonConvert.DeserializeObject<List<TriviaQuestion>>(json);
-    #else
-        // If you didn’t install Newtonsoft, wrap your JSON in {"questions": [...]}
-        try
+        else
         {
-            var wrapper = JsonUtility.FromJson<TriviaQuestionList>(json);
-            allQuestions = wrapper != null && wrapper.questions != null
-                ? new List<TriviaQuestion>(wrapper.questions)
-                : new List<TriviaQuestion>();
+            Debug.LogError("Could not find trivia_questions.json at: " + filePath);
         }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"[QuestionManager] JSON parse error: {ex.Message}");
-            allQuestions = new List<TriviaQuestion>();
-        }
-    #endif
-
-        Debug.Log($"[QuestionManager] Loaded {allQuestions.Count} questions.");
     }
 
-    /// <summary>
-    /// Returns a random question from the list.
-    /// </summary>
-    public TriviaQuestion GetRandomQuestion()
+    public QuestionData GetRandomQuestion()
     {
         if (allQuestions == null || allQuestions.Count == 0)
         {
-            Debug.LogWarning("[QuestionManager] No questions loaded.");
+            Debug.LogWarning("No questions loaded.");
             return null;
         }
+
         int index = Random.Range(0, allQuestions.Count);
         return allQuestions[index];
     }
-}
-
-// Only needed if not using Newtonsoft
-[System.Serializable]
-public class TriviaQuestionList
-{
-    public TriviaQuestion[] questions;
 }
