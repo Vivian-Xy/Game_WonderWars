@@ -12,25 +12,61 @@ public class TriviaUIController : MonoBehaviour
     public Button[] answerButtons; // Assign AnswerButton1–4 in Inspector
     public GameObject progressCard; // Optional reward panel
 
-    private QuestionData currentQuestion; // Fix: should be a single QuestionData, not a list
+    private QuestionData currentQuestion;
 
     void Start()
     {
+        // Wait for QuestionManager.Instance to be assigned (not just null check)
+        StartCoroutine(WaitForQuestionManager());
+    }
+
+    private IEnumerator WaitForQuestionManager()
+    {
+        int safety = 0;
+        // Wait until the singleton is assigned (Awake runs on all objects before Start)
+        while (QuestionManager.Instance == null && safety < 300)
+        {
+            yield return null;
+            safety++;
+        }
+
+        if (QuestionManager.Instance == null)
+        {
+            Debug.LogError("TriviaUIController: QuestionManager.Instance is STILL null after waiting.");
+            questionText.text = "Question system not initialized.";
+            foreach (var btn in answerButtons)
+                btn.gameObject.SetActive(false);
+            yield break;
+        }
+
+        // Now wait for questions to load
+        yield return StartCoroutine(DelayedShow());
+    }
+
+    IEnumerator DelayedShow()
+    {
+        // Wait for questions to load
+        int safety = 0;
+        while ((QuestionManager.Instance.allQuestions == null || QuestionManager.Instance.allQuestions.Count == 0) && safety < 300)
+        {
+            yield return null;
+            safety++;
+        }
+
+        if (QuestionManager.Instance.allQuestions == null || QuestionManager.Instance.allQuestions.Count == 0)
+        {
+            Debug.LogError("TriviaUIController: Questions failed to load after waiting.");
+            questionText.text = "Failed to load questions.";
+            foreach (var btn in answerButtons)
+                btn.gameObject.SetActive(false);
+            yield break;
+        }
+
         ShowNextQuestion();
     }
 
     public void ShowNextQuestion()
     {
-        // Defensive: check if QuestionManager.Instance exists
-        if (QuestionManager.Instance == null)
-        {
-            Debug.LogError("QuestionManager.Instance is null!");
-            questionText.text = "No question manager found.";
-            foreach (var btn in answerButtons)
-                btn.gameObject.SetActive(false);
-            return;
-        }
-
         currentQuestion = QuestionManager.Instance.GetRandomQuestion();
 
         if (currentQuestion == null)
@@ -48,8 +84,6 @@ public class TriviaUIController : MonoBehaviour
         for (int i = 0; i < answerButtons.Length; i++)
         {
             int index = i;
-
-            // Defensive: check answers list
             if (currentQuestion.answers != null && currentQuestion.answers.Length > index)
             {
                 answerButtons[i].gameObject.SetActive(true);
@@ -99,7 +133,7 @@ public class TriviaUIController : MonoBehaviour
         // If correct, reward
         if (isCorrect)
         {
-            RewardPlayer(currentQuestion.rewardPrefabID);
+            RewardPlayer(currentQuestion.RewardPrefabID);
         }
 
         // Go back to dashboard after short delay

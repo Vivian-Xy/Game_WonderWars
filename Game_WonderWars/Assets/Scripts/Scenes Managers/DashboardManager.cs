@@ -61,6 +61,11 @@ public class DashboardManager : MonoBehaviour
         )
         {
             Debug.LogError("DashboardManager: One or more UI references are not set in the Inspector.");
+            foreach (var go in new Object[] { progressCardPrefab, cardsParent, historyEntryPrefab, historyContent, rewardIconPrefab, inventoryPanel, overallChartFill, overallChartLabel, usernameInput, avatarDropdown })
+            {
+                if (go == null)
+                    Debug.LogError($"DashboardManager: Missing reference: {go}");
+            }
             enabled = false;
             return;
         }

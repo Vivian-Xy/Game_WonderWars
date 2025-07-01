@@ -15,7 +15,7 @@ public class LoginManager : MonoBehaviour
 
     [Header("Scene Management")]
     [Tooltip("Name of the scene to load after successful login")]
-    public string nextSceneName = "TriviaScene";
+    public string nextSceneName = "DashboardScene";
 
     void Start()
     {
@@ -54,17 +54,13 @@ public class LoginManager : MonoBehaviour
 
         PlayerPrefs.Save();
 
-         // Direct load:
-         // if (!string.IsNullOrEmpty(nextSceneName))
-         // SceneManager.LoadScene(nextSceneName);
-         // Smooth transition:
-         if (!string.IsNullOrEmpty(nextSceneName) && SceneTransitionManager.Instance != null)
-         SceneTransitionManager.Instance.LoadScene(nextSceneName);
-
-        // Transition to the trivia scene
+        // Only load the dashboard scene once, using SceneTransitionManager if available
         if (!string.IsNullOrEmpty(nextSceneName))
         {
-            SceneManager.LoadScene(nextSceneName);
+            if (SceneTransitionManager.Instance != null)
+                SceneTransitionManager.Instance.LoadScene(nextSceneName);
+            else
+                SceneManager.LoadScene(nextSceneName);
         }
         else
         {

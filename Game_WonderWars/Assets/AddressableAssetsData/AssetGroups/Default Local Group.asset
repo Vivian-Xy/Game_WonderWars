@@ -1,0 +1,224 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_GUID: a2a7441019e18784ab481754af7fce29
+  m_SerializeEntries:
+  - m_GUID: 0f59020c277c9874ea891495e3bb2230
+    m_Address: Assets/Avatars/kids/black little girl with large curls.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1719dc1313ecfc24c9541dac16859caa
+    m_Address: Assets/Avatars/androgyne
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2c308cef1d3cbe74fb0430fcf3450d1a
+    m_Address: Assets/Avatars/female/black mature woman with curly hair and earrings.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2f99aea8667cf584d8f8757a0d477773
+    m_Address: Assets/Avatars/androgyne/androgyne black teenage boy with piercing.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38a0ad5d5f1887d41bba7d8e6590ec0e
+    m_Address: Assets/Avatars/teens
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 390ae2b369de9744994796917743e99b
+    m_Address: Assets/Avatars/androgyne/androgyne white teenager with blue eyes and
+      long straight black hair.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4ae3662810bd2924bb11d620d0088768
+    m_Address: Assets/Avatars/female/asian girl with long straight hair and pulp
+      lips.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c9f0b19272598746b92e08bf5b4b20f
+    m_Address: Assets/Avatars/androgyne/androgyne chinese teenager with hair pulled
+      back.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 524719053823d4442bcd45abb41484ec
+    m_Address: Assets/Avatars/male
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 583e1d74ef276ef48ab4291cc6d40444
+    m_Address: Assets/Avatars/male/black man with earrings and birthmark on right
+      cheek.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 62f5a2f3452f82948a465089b5c56608
+    m_Address: Assets/Avatars
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6629875166b835444a88597e6d0a671c
+    m_Address: Assets/Avatars/teens/puerto rican teenage girl with curly hair.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7e6d0590cbd7b874b9d41cc37010dd63
+    m_Address: Assets/Avatars/androgyne/androgyne black teenage boy with piercing.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8673b11038d88dd4f913c8174f79f824
+    m_Address: Assets/Avatars/androgyne/androgyne white teenager with blue eyes and
+      long straight black hair.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8ae5f9426708a8444ad186930ca0518e
+    m_Address: Assets/Avatars/female
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9a8b841cb381e584eb96a025b26422e7
+    m_Address: Assets/Avatars/androgyne/androgyne red hair person with green eyes
+      and slight smile.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aeb0f019cf9b9994b80d2e916d4a8afc
+    m_Address: Assets/Avatars/androgyne/spanish teenage androgyne person with curly
+      hair.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aedd60336d691104789e1d9c5c477e7c
+    m_Address: Assets/Avatars/androgyne/white androgyne teenager with brown hair
+      and pulp lips.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b13a61db0defff84187d3deb098d8e9a
+    m_Address: Assets/Avatars/androgyne/androgyne red hair person with green eyes
+      and slight smile.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b9a0cf1dc8e418546a1235c09b8a774a
+    m_Address: Assets/Avatars/kids/little boy with white hair and blue eyes.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c19185d37c4761f47a9afd4d5c4c767f
+    m_Address: Assets/Avatars/male/algerian man with curly beard looks anxious.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c8f38ee03b79827478321481d64beaf7
+    m_Address: Assets/Avatars/androgyne/young spanish androgyne person with short
+      hair.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cd0f62e63cb004b42bbf8cc11ef6b919
+    m_Address: Assets/Avatars/androgyne/young spanish androgyne person with short
+      hair.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3296000e4ed49b418a05f0deabe09ad
+    m_Address: Assets/Avatars/androgyne/spanish teenage androgyne person with curly
+      hair.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d6c7a8e94c3e8bd4d9cffbefb5ffaf61
+    m_Address: Assets/Avatars/kids
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d746df6fdf1433a4f9206de3d84a28b9
+    m_Address: Assets/Avatars/teens/blasian teenage boy with ginger afro.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: db19647cd2475be4c85031a3fb049151
+    m_Address: Assets/Avatars/teens/teenage girl with curly hair and wide brown eyes.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e8678af8e91c23f4f99023da119eecca
+    m_Address: Assets/Avatars/androgyne/korean young androgyne with round head and
+      pulpy lips.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f03e877dec1b0914388efbf6e258acf8
+    m_Address: Assets/Avatars/androgyne/korean young androgyne with round head and
+      pulpy lips.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fd7216879df1c5644b72c2341810fada
+    m_Address: Assets/Avatars/androgyne/androgyne chinese teenager with hair pulled
+      back.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fde55b2dc80e25843b3d499053a8716a
+    m_Address: Assets/Avatars/female/japanese woman in glasses with short white hair.psd
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Avatars
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 037d3b11b44220d4789d18a8dba4ee77, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 9e9be3cc0b665934bade864357145b0d, type: 2}
+    - {fileID: 11400000, guid: 2b1a5299131b7254ba911e4ec80d15df, type: 2}
