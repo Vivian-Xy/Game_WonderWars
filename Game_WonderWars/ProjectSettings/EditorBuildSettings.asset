@@ -18,7 +18,12 @@ EditorBuildSettings:
     path: Assets/Scenes/TriviaScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 48be4f31f64e3ac469f2ad4e96632490, type: 2}
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 663266f7686631c47a112de52eef56dc, type: 2}
+    com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: db20e80eb70d6044f8c405ce8046ea10, type: 2}
+    com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: fb688e98c825d7147acb81ccbc5827b3, type: 2}
+    com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: be9853a83d907db4281a70b30f192750, type: 2}
+    com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 91b7a5b6adc42c44cb5012e3537d7791, type: 2}
     com.unity.addressableassets: {fileID: 11400000, guid: 15a78100675651446a71735c14a228d9, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 4112579f8486ad74a9856fdbac6d090e, type: 2}

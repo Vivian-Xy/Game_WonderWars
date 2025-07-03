@@ -13,6 +13,7 @@ public class DashboardUI : MonoBehaviour
     public TMP_Text scoreText;
     public TMP_Text progressList;
     public Button logoutButton;
+    public Button playTriviaButton; // Assign in Inspector
 
     [Header("Backend")]
     public BackendManager backend;
@@ -35,6 +36,8 @@ public class DashboardUI : MonoBehaviour
         }
         if (logoutButton != null)
             logoutButton.onClick.AddListener(OnLogout);
+        if (playTriviaButton != null)
+            playTriviaButton.onClick.AddListener(OnPlayTrivia);
 
         // 3) Fetch data only if credentials are present
         if (!string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(authToken))
@@ -52,6 +55,12 @@ public class DashboardUI : MonoBehaviour
         PlayerPrefs.DeleteKey("authToken");
         PlayerPrefs.DeleteKey("userId");
         SceneManager.LoadScene("LoginScene");
+    }
+
+    void OnPlayTrivia()
+    {
+        // Defensive: ensure the scene exists and is spelled correctly
+        SceneManager.LoadScene("TriviaScene");
     }
 
     // Callback from BackendManager

@@ -3793,9 +3793,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2078820610}
-        m_TargetAssemblyTypeName: AuthUIManager, Assembly-CSharp
-        m_MethodName: OnRegisterClick
+      - m_Target: {fileID: 2078820612}
+        m_TargetAssemblyTypeName: RegistrationController, Assembly-CSharp
+        m_MethodName: GoToLogin
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

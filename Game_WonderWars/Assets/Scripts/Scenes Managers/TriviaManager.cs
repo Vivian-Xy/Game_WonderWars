@@ -5,12 +5,12 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
+using System.IO; // Add this at the top if it's not already there
 
-/// <summary>
-/// Manages trivia questions, user input, rewards, and history tracking.
-/// </summary>
 public class TriviaManager : MonoBehaviour
 {
+    public static TriviaManager Instance;
+
     [Header("UI References")]
     public TextMeshProUGUI questionText;
     public Button[] answerButtons;
@@ -48,20 +48,23 @@ public class TriviaManager : MonoBehaviour
         public string rewardPrefabID;
     }
 
-    // Working pool after shuffle
     private List<TriviaQuestion> pool;
     private int currentQuestionIndex = 0;
 
     public int CurrentScore = 0;
 
-    // Runtime tracking
-    // Exposed for the Dashboard
+    private const int MaxQuestions = 20;
+    private int questionsAnswered = 0;
+    private int currentIndex = 0;
+
+    public List<TriviaQuestion> allQuestions = new List<TriviaQuestion>();
+
     [System.Serializable]
     public class TriviaHistoryItem
     {
         public string questionText;
         public bool wasCorrect;
-        public string rewardID; // which monument, if any
+        public string rewardID;
         public TriviaHistoryItem(string q, bool c, string r)
         {
             questionText = q;
@@ -75,50 +78,42 @@ public class TriviaManager : MonoBehaviour
     {
         public string monumentID;
         public int unlockedCount;
-        public int totalPossible;   // usually number of questions for that monument
+        public int totalPossible;
     }
 
     public List<TriviaHistoryItem> history = new List<TriviaHistoryItem>();
     public List<MonumentProgress> monumentProgress = new List<MonumentProgress>();
 
-    #region Data Classes
-    #endregion
-
     void Awake()
     {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
 
-        // Load score from PlayerPrefs
+        currentIndex = 0;
+        questionsAnswered = 0;
+
         CurrentScore = PlayerPrefs.GetInt("TriviaScore", 0);
     }
 
     void Start()
     {
-        // Prepare question pool
+        // Ensure questions are loaded from JSON before using GetNextQuestion
+        questions = LoadFromJSON();
         pool = new List<TriviaQuestion>(questions);
         Shuffle(pool);
-
-        // Reset index and score UI
         currentQuestionIndex = 0;
+        questionsAnswered = 0;
         UpdateScoreText();
-
-        // Initialize monument progress based on question bank
         InitializeMonumentProgress();
-
-        // Display first question
-        if (pool != null && pool.Count > 0)
-            DisplayQuestion();
-        else
-            Debug.LogWarning("TriviaManager: No questions available. Check that your questions list is populated.");
     }
 
-    #region Initialization
     private void InitializeMonumentProgress()
     {
         monumentProgress.Clear();
-        // For each unique rewardID in questions
         foreach (var q in questions)
         {
             if (!monumentProgress.Exists(m => m.monumentID == q.rewardPrefabID))
@@ -132,13 +127,10 @@ public class TriviaManager : MonoBehaviour
             }
         }
 
-        // Restore unlockedCount from PlayerPrefs
         foreach (var mp in monumentProgress)
             mp.unlockedCount = PlayerPrefs.GetInt($"Unlocked_{mp.monumentID}", 0);
     }
-    #endregion
 
-    #region Question Flow
     private void Shuffle<T>(List<T> list)
     {
         for (int i = 0; i < list.Count; i++)
@@ -150,193 +142,50 @@ public class TriviaManager : MonoBehaviour
         }
     }
 
-    public void DisplayQuestion()
+    public TriviaQuestion GetNextQuestion()
     {
-        if (feedbackText != null)
-            feedbackText.text = "";
-
-        if (currentQuestionIndex >= pool.Count)
+        // Restore: just use pool and questionsAnswered
+        if (pool == null || pool.Count == 0)
         {
-            EndTrivia();
-            return;
+            Debug.LogWarning("[TriviaManager] No questions in pool!");
+            return null;
         }
 
-        var current = pool[currentQuestionIndex];
-        questionText.text = current.questionText;
-
-        for (int i = 0; i < answerButtons.Length; i++)
+        if (currentQuestionIndex < pool.Count && questionsAnswered < MaxQuestions)
         {
-            var btn = answerButtons[i];
-            if (i < current.answers.Length)
-            {
-                btn.gameObject.SetActive(true);
-                btn.GetComponentInChildren<TextMeshProUGUI>().text = current.answers[i];
-                btn.onClick.RemoveAllListeners();
-                int idx = i;
-                btn.onClick.AddListener(() => CheckAnswer(idx));
-            }
-            else
-            {
-                btn.gameObject.SetActive(false);
-            }
+            var q = pool[currentQuestionIndex];
+            currentQuestionIndex++;
+            return q;
         }
+
+        return null;
     }
 
-    public void CheckAnswer(int chosenIndex)
+    public void RegisterAnswer(bool isCorrect)
     {
-        var current = pool[currentQuestionIndex];
-        bool isCorrect = (chosenIndex == current.correctAnswerIndex);
-        string rewardID = current.rewardPrefabID;
-
-        // Record history
-        history.Add(new TriviaHistoryItem(
-            current.questionText, isCorrect, rewardID));
-
         if (isCorrect)
         {
             CurrentScore++;
             UpdateScoreText();
-            if (feedbackText != null)
-                feedbackText.text = "Correct!";
-            if (correctClip != null)
-                SFXManager.I.Play(correctClip, 0.8f);
-
-            SendHapticImpulse(hapticAmplitude, hapticDuration);
-            StartCoroutine(FlashButtonColor(answerButtons[chosenIndex], Color.green, 0.3f));
-            StartCoroutine(PopButtonAnimation(answerButtons[chosenIndex].transform));
-
-            // Spawn FX
-            SpawnFX(correctFXPrefab, answerButtons[chosenIndex].transform.position);
-
-            // Spawn reward prefab
-            var prefab = GetRewardPrefab(rewardID);
-            if (prefab != null && rewardSpawnPoint != null)
-            {
-                var inst = Instantiate(prefab, rewardSpawnPoint.position, Quaternion.identity);
-                inst.transform.SetParent(rewardSpawnPoint.parent, true);
-                if (inst.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>() == null)
-                    inst.AddComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
-
-                // Play reward spawn SFX
-                if (rewardSpawnClip != null)
-                    SFXManager.I.Play(rewardSpawnClip, 0.8f);
-
-                // Update progress
-                var mp = monumentProgress.First(m => m.monumentID == rewardID);
-                mp.unlockedCount++;
-                PlayerPrefs.SetInt($"Unlocked_{mp.monumentID}", mp.unlockedCount);
-
-                // After awarding the piece, show a progress card
-                string pieceName = prefab.name + " Piece";
-                Sprite pieceSprite = Resources.Load<Sprite>($"Monuments/{pieceName}");
-                if (ProgressCardSpawner.Instance != null)
-                    ProgressCardSpawner.Instance.SpawnCard(pieceName, pieceSprite);
-            }
         }
-        else
+        questionsAnswered++;
+    }
+
+    // Utility to load questions from JSON file in StreamingAssets
+    public List<TriviaQuestion> LoadFromJSON()
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, "trivia_questions.json");
+
+        if (!File.Exists(path))
         {
-            if (feedbackText != null)
-                feedbackText.text = "Wrong—try again!";
-            if (wrongClip != null)
-                SFXManager.I.Play(wrongClip, 0.8f);
-
-            SendHapticImpulse(hapticAmplitude * 0.5f, hapticDuration);
-            StartCoroutine(FlashButtonColor(answerButtons[chosenIndex], Color.red, 0.3f));
-            StartCoroutine(PopButtonAnimation(answerButtons[chosenIndex].transform));
-
-            // Spawn FX
-            SpawnFX(wrongFXPrefab, answerButtons[chosenIndex].transform.position);
+            Debug.LogError("[TriviaManager] JSON file not found at: " + path);
+            return new List<TriviaQuestion>();
         }
 
-        currentQuestionIndex++;
-        StartCoroutine(NextQuestionAfterDelay(1f));
+        string json = File.ReadAllText(path);
+        return new List<TriviaQuestion>(JsonHelper.FromJson<TriviaQuestion>(json));
     }
 
-    private IEnumerator NextQuestionAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        DisplayQuestion();
-    }
-
-    private void EndTrivia()
-    {
-        Debug.Log("Trivia complete! No more questions.");
-        foreach (var btn in answerButtons)
-            btn.gameObject.SetActive(false);
-            
-        // Show the Continue button
-        var continueBtn = GameObject.Find("TriviaCanvas/ContinueButton");
-        if (continueBtn != null)
-        continueBtn.SetActive(true);
-    }
-
-    private void SpawnFX(GameObject fxPrefab, Vector3 position)
-    {
-        if (fxPrefab == null) return;
-        Vector3 fxPos = position + Vector3.up * fxSpawnYOffset;
-        Instantiate(fxPrefab, fxPos, Quaternion.identity);
-    }
-    #endregion
-
-    #region Helpers
-    private GameObject GetRewardPrefab(string rewardID)
-    {
-        foreach (var prefab in rewardPrefabs)
-        {
-            if (prefab.name == rewardID)
-                return prefab;
-        }
-        Debug.LogWarning($"Reward prefab for ID '{rewardID}' not found!");
-        return null;
-    }
-
-    private void SendHapticImpulse(float amplitude, float duration)
-    {
-        var controllers = FindObjectsOfType<XRController>();
-        foreach (var ctrl in controllers)
-        {
-            try { ctrl.SendHapticImpulse(amplitude, duration); } catch { }
-        }
-    }
-
-    private IEnumerator PopButtonAnimation(Transform buttonTransform)
-    {
-        Vector3 orig = buttonTransform.localScale;
-        Vector3 pop = orig * 1.15f;
-        float t = 0f, dur = 0.1f;
-        while (t < dur)
-        {
-            buttonTransform.localScale = Vector3.Lerp(orig, pop, t / dur);
-            t += Time.deltaTime;
-            yield return null;
-        }
-        buttonTransform.localScale = pop;
-        t = 0f;
-        while (t < dur)
-        {
-            buttonTransform.localScale = Vector3.Lerp(pop, orig, t / dur);
-            t += Time.deltaTime;
-            yield return null;
-        }
-        buttonTransform.localScale = orig;
-    }
-
-    private IEnumerator FlashButtonColor(Button button, Color flashColor, float duration)
-    {
-        var colors = button.colors;
-        Color origNorm = colors.normalColor;
-        Color origHigh = colors.highlightedColor;
-        colors.normalColor = flashColor;
-        colors.highlightedColor = flashColor;
-        button.colors = colors;
-        yield return new WaitForSeconds(duration);
-        colors.normalColor = origNorm;
-        colors.highlightedColor = origHigh;
-        button.colors = colors;
-    }
-    #endregion
-
-    #region Score Persistence
     private void UpdateScoreText()
     {
         if (scoreText != null)
@@ -344,13 +193,13 @@ public class TriviaManager : MonoBehaviour
         PlayerPrefs.SetInt("TriviaScore", CurrentScore);
         PlayerPrefs.Save();
     }
+} 
 
-    public void ResetScore()
-    {
-        CurrentScore = 0;
-        PlayerPrefs.SetInt("TriviaScore", 0);
-        PlayerPrefs.Save();
-        UpdateScoreText();
-    }
-    #endregion
-}
+// TriviaUIController.cs — no change needed if you already call GetNextQuestion() correctly
+    
+
+
+
+// TriviaUIController.cs — no change needed if you already call GetNextQuestion() correctly
+
+// TriviaUIController.cs — no change needed if you already call GetNextQuestion() correctly

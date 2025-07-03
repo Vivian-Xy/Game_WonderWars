@@ -56,7 +56,7 @@ public class RegistrationController : MonoBehaviour
             // Optionally show feedback before scene change
             feedbackText.text = "Registration successful!";
             // Use the correct scene name for your dashboard/main menu
-            SceneManager.LoadScene("Dashboard");
+            SceneManager.LoadScene("DashboardScene");
         }
         else
         {

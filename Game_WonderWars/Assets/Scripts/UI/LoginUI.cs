@@ -10,6 +10,11 @@ public class LoginUI : MonoBehaviour
     public TMP_InputField passwordInput;
     public TMP_Text feedbackText;
 
+    // Add these for panel switching
+    public GameObject loginPanel;
+    public GameObject resetPanel;
+    public Button forgotPasswordButton;
+
     [Header("Backend")]
     public BackendManager backend;
 
@@ -55,6 +60,22 @@ public class LoginUI : MonoBehaviour
 
         // Transition to Dashboard
         SceneManager.LoadScene("DashboardScene");
+    }
+
+    void Start()
+    {
+        // show login, hide reset
+        if (loginPanel != null) loginPanel.SetActive(true);
+        if (resetPanel != null) resetPanel.SetActive(false);
+
+        // wire the forgot‑password link
+        if (forgotPasswordButton != null)
+        {
+            forgotPasswordButton.onClick.AddListener(() => {
+                if (loginPanel != null) loginPanel.SetActive(false);
+                if (resetPanel != null) resetPanel.SetActive(true);
+            });
+        }
     }
 
     // Helper classes to match your backend’s JSON

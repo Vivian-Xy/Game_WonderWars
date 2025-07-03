@@ -9,135 +9,96 @@ public class TriviaUIController : MonoBehaviour
 {
     [Header("UI References")]
     public TextMeshProUGUI questionText;
-    public Button[] answerButtons; // Assign AnswerButton1–4 in Inspector
-    public GameObject progressCard; // Optional reward panel
+    public Button[] answerButtons;
+    public GameObject progressCard;
 
     private QuestionData currentQuestion;
+    private int questionsAnswered = 0;
+    private const int MaxQuestions = 20;
 
     void Start()
     {
-        // Wait for QuestionManager.Instance to be assigned (not just null check)
-        StartCoroutine(WaitForQuestionManager());
-    }
-
-    private IEnumerator WaitForQuestionManager()
-    {
-        int safety = 0;
-        // Wait until the singleton is assigned (Awake runs on all objects before Start)
-        while (QuestionManager.Instance == null && safety < 300)
-        {
-            yield return null;
-            safety++;
-        }
-
-        if (QuestionManager.Instance == null)
-        {
-            Debug.LogError("TriviaUIController: QuestionManager.Instance is STILL null after waiting.");
-            questionText.text = "Question system not initialized.";
-            foreach (var btn in answerButtons)
-                btn.gameObject.SetActive(false);
-            yield break;
-        }
-
-        // Now wait for questions to load
-        yield return StartCoroutine(DelayedShow());
-    }
-
-    IEnumerator DelayedShow()
-    {
-        // Wait for questions to load
-        int safety = 0;
-        while ((QuestionManager.Instance.allQuestions == null || QuestionManager.Instance.allQuestions.Count == 0) && safety < 300)
-        {
-            yield return null;
-            safety++;
-        }
-
-        if (QuestionManager.Instance.allQuestions == null || QuestionManager.Instance.allQuestions.Count == 0)
-        {
-            Debug.LogError("TriviaUIController: Questions failed to load after waiting.");
-            questionText.text = "Failed to load questions.";
-            foreach (var btn in answerButtons)
-                btn.gameObject.SetActive(false);
-            yield break;
-        }
-
+        questionsAnswered = 0;
         ShowNextQuestion();
     }
 
     public void ShowNextQuestion()
     {
-        currentQuestion = QuestionManager.Instance.GetRandomQuestion();
+        var question = TriviaManager.Instance.GetNextQuestion();
 
-        if (currentQuestion == null)
+        // Only check for null, let TriviaManager handle MaxQuestions logic
+        if (question == null)
         {
-            Debug.LogWarning("No question available.");
-            questionText.text = "No question available.";
-            foreach (var btn in answerButtons)
-                btn.gameObject.SetActive(false);
+            Debug.Log("[TriviaUI] No more questions, going back to Dashboard");
+            SceneManager.LoadScene("DashboardScene");
             return;
         }
 
+        currentQuestion = new QuestionData
+        {
+            questionText = question.questionText,
+            answers = question.answers,
+            correctAnswerIndex = question.correctAnswerIndex,
+            RewardPrefabID = question.rewardPrefabID
+        };
+
         questionText.text = currentQuestion.questionText;
-        Debug.Log($"Loaded Question: {currentQuestion.questionText}");
 
         for (int i = 0; i < answerButtons.Length; i++)
         {
-            int index = i;
-            if (currentQuestion.answers != null && currentQuestion.answers.Length > index)
+            if (i < currentQuestion.answers.Length)
             {
                 answerButtons[i].gameObject.SetActive(true);
-                TextMeshProUGUI label = answerButtons[i].GetComponentInChildren<TextMeshProUGUI>();
-                if (label != null)
-                {
-                    label.text = currentQuestion.answers[index];
-                    Debug.Log($"Set AnswerButton {i + 1}: {label.text}");
-                }
-                else
-                {
-                    Debug.LogWarning($"AnswerButton {i + 1} has no TextMeshProUGUI child!");
-                }
+                answerButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = currentQuestion.answers[i];
+                int index = i;
                 answerButtons[i].onClick.RemoveAllListeners();
                 answerButtons[i].onClick.AddListener(() => OnChoiceSelected(index));
-                answerButtons[i].interactable = true;
             }
             else
             {
                 answerButtons[i].gameObject.SetActive(false);
             }
         }
+
+        if (progressCard != null)
+            progressCard.SetActive(false);
     }
 
-    public void OnChoiceSelected(int selectedIndex)
+    public void OnChoiceSelected(int index)
     {
-        // Defensive: check answers list and index
-        bool isCorrect = false;
-        if (currentQuestion.answers != null && selectedIndex >= 0 && selectedIndex < currentQuestion.answers.Length)
+        if (index < 0 || index >= currentQuestion.answers.Length)
         {
-            isCorrect = string.Equals(
-                currentQuestion.answers[selectedIndex].Trim(),
-                currentQuestion.answers[currentQuestion.correctAnswerIndex].Trim(),
-                System.StringComparison.OrdinalIgnoreCase
-            );
+            Debug.LogError($"[TriviaUI] Invalid index selected: {index}");
+            return;
+        }
+
+        bool isCorrect = index == currentQuestion.correctAnswerIndex;
+
+        if (isCorrect)
+            RewardPlayer(currentQuestion.RewardPrefabID);
+
+        HighlightAnswers(index);
+
+        // Update score and question count in TriviaManager
+        TriviaManager.Instance.RegisterAnswer(isCorrect);
+
+        StartCoroutine(ProceedAfterDelay(1.5f));
+    }
+
+    IEnumerator ProceedAfterDelay(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+
+        // Only check if there are more questions (let TriviaManager handle max logic)
+        // Remove duplicate SceneManager.LoadScene("DashboardScene") calls elsewhere in this script.
+        if (TriviaManager.Instance.GetNextQuestion() == null)
+        {
+            SceneManager.LoadScene("DashboardScene");
         }
         else
         {
-            Debug.LogWarning($"Selected answer index {selectedIndex} is out of range or answers list is null.");
+            ShowNextQuestion();
         }
-
-        Debug.Log($"You selected {selectedIndex} → {(isCorrect ? "Correct" : "Wrong")}");
-
-        // Highlight the selected button (optional visual feedback)
-        HighlightAnswers(selectedIndex);
-
-        // If correct, reward
-        if (isCorrect)
-        {
-            RewardPlayer(currentQuestion.RewardPrefabID);
-        }
-
-        // Go back to dashboard after short delay
-        StartCoroutine(ReturnToDashboardAfterDelay(1.5f));
     }
 
     void HighlightAnswers(int selectedIndex)
@@ -151,32 +112,20 @@ public class TriviaUIController : MonoBehaviour
                 colors.normalColor = Color.red;
             else
                 colors.normalColor = Color.white;
-
             answerButtons[i].colors = colors;
         }
     }
 
-    void RewardPlayer(string pieceName)
+    void RewardPlayer(string piece)
     {
-        Debug.Log($"🎁 Player earned: {pieceName}");
         if (PlayerDataManager.Instance != null)
-            PlayerDataManager.Instance.AddPiece(pieceName);
+        {
+            PlayerDataManager.Instance.AddPiece(piece);
+        }
 
         if (progressCard != null)
         {
             progressCard.SetActive(true);
         }
-    }
-
-    IEnumerator ReturnToDashboardAfterDelay(float seconds)
-    {
-        yield return new WaitForSeconds(seconds);
-        SceneManager.LoadScene("DashboardScene"); // Adjust scene name if needed
-    }
-
-    // Optional manual back button
-    public void BackToDashboard()
-    {
-        SceneManager.LoadScene("DashboardScene");
     }
 }

@@ -63,8 +63,9 @@ public class QuestionManager : MonoBehaviour
             Debug.LogWarning("No questions loaded.");
             return null;
         }
-
-        int index = Random.Range(0, allQuestions.Count);
-        return allQuestions[index];
+        int idx = Random.Range(0, allQuestions.Count);
+        var q = allQuestions[idx];
+        allQuestions.RemoveAt(idx);
+        return q;
     }
 }

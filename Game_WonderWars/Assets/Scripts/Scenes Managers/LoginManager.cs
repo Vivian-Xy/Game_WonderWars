@@ -45,6 +45,7 @@ public class LoginManager : MonoBehaviour
 
         // Save username
         PlayerPrefs.SetString("Username", username);
+        PlayerPrefs.SetString("LoggedInUser", username); // Also save as "LoggedInUser"
 
         // Save avatar choice if available
         if (avatarDropdown != null)

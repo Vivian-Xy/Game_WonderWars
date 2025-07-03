@@ -3,35 +3,31 @@ using UnityEngine;
 /// <summary>
 /// Attach this script to the GameObject you want to rotate with the phone's gyroscope.
 /// </summary>
-public class PhoneGyro : MonoBehaviour
+public class GyroController : MonoBehaviour
 {
     private Gyroscope gyro;
-    private bool gyroEnabled;
-    // This rotation fix is commonly used for landscape orientation
-    private readonly Quaternion rotFix = new Quaternion(0, 0, 1, 0);
+    private bool gyroSupported;
 
     void Start()
     {
-        // Enable the gyroscope if supported
-        if (SystemInfo.supportsGyroscope)
+        gyroSupported = SystemInfo.supportsGyroscope;
+        if (gyroSupported)
         {
             gyro = Input.gyro;
             gyro.enabled = true;
-            gyroEnabled = true;
         }
         else
         {
-            gyroEnabled = false;
             Debug.LogWarning("Gyroscope not supported on this device.");
         }
     }
 
     void Update()
     {
-        if (gyroEnabled)
+        if (gyroSupported)
         {
-            // Apply the gyroscope attitude with the rotation fix
-            transform.localRotation = gyro.attitude * rotFix;
+            // For most devices, this orientation works for landscape
+            transform.localRotation = Quaternion.Euler(90f, 0f, 0f) * gyro.attitude;
         }
     }
 }

@@ -2,140 +2,140 @@
   {
     "id": "q1",
     "questionText": "Which city is home to the Colosseum?",
-    "answers": ["Rome", "Athens","Cairo","Paris"],
+    "answers": ["Rome", "Athens", "Cairo"],
     "correctAnswerIndex": 0,
     "RewardPrefabID": "Colosseum Piece"
   },
   {
     "id": "q2",
     "questionText": "In which country is the Great Wall located?",
-    "answers": ["India", "China", "Mexico", "Egypt"],
+    "answers": ["India", "China", "Mexico"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "GreatWall Piece"
   },
   {
     "id": "q3",
     "questionText": "What is the tallest mountain in the world?",
-    "answers": ["K2", "Mount Everest", "Kilimanjaro", "Denali"],
+    "answers": ["K2", "Mount Everest", "Kilimanjaro"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "Everest Piece"
   },
   {
     "id": "q4",
     "questionText": "Which river flows through Egypt?",
-    "answers": ["Amazon", "Nile", "Yangtze", "Danube"],
+    "answers": ["Amazon", "Nile", "Yangtze"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "Nile Piece"
   },
   {
     "id": "q5",
     "questionText": "Which country is famous for the Eiffel Tower?",
-    "answers": ["Italy", "France", "Spain", "Germany"],
+    "answers": ["Italy", "France", "Spain"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "EiffelTower Piece"
   },
   {
     "id": "q6",
     "questionText": "Machu Picchu is located in which country?",
-    "answers": ["Peru", "Brazil", "Chile", "Argentina"],
+    "answers": ["Peru", "Brazil", "Chile"],
     "correctAnswerIndex": 0,
     "RewardPrefabID": "MachuPicchu Piece"
   },
   {
     "id": "q7",
     "questionText": "Which ancient wonder was located in Babylon?",
-    "answers": ["Hanging Gardens", "Colossus of Rhodes", "Lighthouse of Alexandria", "Temple of Artemis"],
+    "answers": ["Hanging Gardens", "Colossus of Rhodes", "Lighthouse of Alexandria"],
     "correctAnswerIndex": 0,
     "RewardPrefabID": "HangingGardens Piece"
   },
   {
     "id": "q8",
     "questionText": "Which city is known as the 'Big Apple'?",
-    "answers": ["Los Angeles", "London", "New York", "Sydney"],
+    "answers": ["Los Angeles", "London", "New York"],
     "correctAnswerIndex": 2,
     "RewardPrefabID": "BigApple Piece"
   },
   {
     "id": "q9",
     "questionText": "The Taj Mahal is located in which Indian city?",
-    "answers": ["Delhi", "Agra", "Mumbai", "Jaipur"],
+    "answers": ["Delhi", "Agra", "Mumbai"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "TajMahal Piece"
   },
   {
     "id": "q10",
     "questionText": "Which country is home to the Acropolis?",
-    "answers": ["Italy", "Greece", "Turkey", "Egypt"],
+    "answers": ["Italy", "Greece", "Turkey"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "Acropolis Piece"
   },
   {
     "id": "q11",
     "questionText": "Which desert is the largest in the world?",
-    "answers": ["Sahara", "Gobi", "Kalahari", "Arabian"],
+    "answers": ["Sahara", "Gobi", "Kalahari"],
     "correctAnswerIndex": 0,
     "RewardPrefabID": "Sahara Piece"
   },
   {
     "id": "q12",
     "questionText": "Which city is famous for its canals and gondolas?",
-    "answers": ["Venice", "Amsterdam", "Bangkok", "Copenhagen"],
+    "answers": ["Venice", "Amsterdam", "Bangkok"],
     "correctAnswerIndex": 0,
     "RewardPrefabID": "Venice Piece"
   },
   {
     "id": "q13",
     "questionText": "Which monument is located in Rio de Janeiro?",
-    "answers": ["Statue of Liberty", "Christ the Redeemer", "Eiffel Tower", "Big Ben"],
+    "answers": ["Statue of Liberty", "Christ the Redeemer", "Eiffel Tower"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "Redeemer Piece"
   },
   {
     "id": "q14",
     "questionText": "Which country is known for the pyramids of Giza?",
-    "answers": ["Mexico", "Egypt", "Peru", "China"],
+    "answers": ["Mexico", "Egypt", "Peru"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "Giza Piece"
   },
   {
     "id": "q15",
     "questionText": "Which city hosted the 2008 Summer Olympics?",
-    "answers": ["London", "Beijing", "Athens", "Sydney"],
+    "answers": ["London", "Beijing", "Athens"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "BeijingOlympics Piece"
   },
   {
     "id": "q16",
     "questionText": "Which country is home to the Sydney Opera House?",
-    "answers": ["New Zealand", "Australia", "Canada", "USA"],
+    "answers": ["New Zealand", "Australia", "Canada"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "SydneyOpera Piece"
   },
   {
     "id": "q17",
     "questionText": "Which city is the capital of Japan?",
-    "answers": ["Kyoto", "Tokyo", "Osaka", "Hiroshima"],
+    "answers": ["Kyoto", "Tokyo", "Osaka"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "Tokyo Piece"
   },
   {
     "id": "q18",
     "questionText": "Which famous wall divides a European city?",
-    "answers": ["Berlin Wall", "Hadrian's Wall", "Great Wall", "Western Wall"],
+    "answers": ["Berlin Wall", "Hadrian's Wall", "Great Wall"],
     "correctAnswerIndex": 0,
     "RewardPrefabID": "BerlinWall Piece"
   },
   {
     "id": "q19",
     "questionText": "Which city is known for the Golden Gate Bridge?",
-    "answers": ["Los Angeles", "San Francisco", "Seattle", "Chicago"],
+    "answers": ["Los Angeles", "San Francisco", "Seattle"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "GoldenGate Piece"
   },
   {
     "id": "q20",
     "questionText": "Which country is home to Stonehenge?",
-    "answers": ["Ireland", "England", "Scotland", "Wales"],
+    "answers": ["Ireland", "England", "Scotland"],
     "correctAnswerIndex": 1,
     "RewardPrefabID": "Stonehenge Piece"
   }
